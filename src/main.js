@@ -28,9 +28,10 @@ new Vue({
     // 设置顶栏菜单
     this.$store.commit('d2admin/menu/headerSet', menuHeader)
     // 设置侧边栏菜单
-    this.$store.commit('d2admin/menu/asideSet', menuAside)
+    // this.$store.commit('d2admin/menu/asideSet', menuAside)
     // 初始化菜单搜索功能
     this.$store.commit('d2admin/search/init', menuHeader)
+    this.$store.dispatch('d2admin/menu/asideCollapseSet', false)
   },
   mounted () {
     // 展示系统信息
@@ -41,5 +42,18 @@ new Vue({
     this.$store.commit('d2admin/ua/get')
     // 初始化全屏监听
     this.$store.dispatch('d2admin/fullscreen/listen')
-  }
+  },
+  watch: {
+    '$route.matched': {
+      handler (matched) {
+        // 菜单联动
+        if (matched.length > 0) {
+          const _side = menuAside.filter(menu => menu.path === matched[0].path)
+          this.$store.commit('d2admin/menu/asideSet', _side.length > 0 ? _side : [])
+        }
+      },
+      // watch声明'$route.matched'之后立即执行handler
+      immediate: true
+    }
+  },
 }).$mount('#app')
